@@ -4,13 +4,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import com.github.slugify.Slugify;
 import com.lodny.springmongorealworld.user.User;
 
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.Getter;
@@ -28,16 +27,14 @@ public class Article {
   private String body;
   private List<String> tagList;
 
-  @CreatedDate
   private Date createdAt;
-  @LastModifiedDate
   private Date updatedAt;
 
   private Boolean favorited;
   private int favoritesCount;
 
   private String slug;
-  
+
   // @JsonProperty("author")
   private User author;
 
@@ -47,8 +44,9 @@ public class Article {
     this.body = dto.getBody();
     this.tagList = dto.getTagList();
 
-    // this.createdAt = new Date();
-    // this.updatedAt = new Date();
+    this.createdAt = new Date();
+    this.updatedAt = new Date();
+
     this.favorited = false;
     this.favoritesCount = 0;
 
@@ -61,7 +59,7 @@ public class Article {
     String value = dto.getTitle();
     if (null != value && !value.isBlank())
       this.title = value;
-      
+
     value = dto.getDescription();
     if (null != value && !value.isBlank())
       this.description = value;
@@ -74,6 +72,8 @@ public class Article {
     if (null != list)
       this.tagList = list;
 
+    this.updatedAt = new Date();
+
     // Optional.ofNullable(dto.getUsername()).filter(o -> !o.get().isBlank()).ifPresent(op -> this.username = op.get());
     // Optional.ofNullable(dto.getEmail()).filter(o -> !o.get().isBlank()).ifPresent(op -> this.email = op.get());
     // Optional.ofNullable(dto.getBio()).filter(o -> !o.get().isBlank()).ifPresent(op -> this.bio = op.get());
@@ -83,21 +83,23 @@ public class Article {
     // );
   }
 
-  public Map<String, Object> toJSON(User user) {
-    
-    Map<String, Object> map = new HashMap<>();    
+  public Map<String, Object> toJSON(User favoritedUser) {
+
+    Map<String, Object> map = new HashMap<>();
     map.put("title", this.title);
-    map.put("slug", this.slug);    
-    map.put("body", this.body);
+    map.put("slug", this.slug);
     map.put("description", this.description);
+    map.put("body", this.body);
     map.put("createdAt", this.createdAt);
     map.put("updatedAt", this.updatedAt);
     map.put("tagList", this.tagList);
-    
-    map.put("favorited", false);
-    map.put("favoritesCount", 0);
 
-    map.put("author", author.toProfileJSON(user));
+    Optional.ofNullable(favoritedUser).ifPresentOrElse(
+      user -> map.put("favorited", user.isFavorite(this.id)),
+      () -> map.put("favorited", false));
+
+    map.put("favoritesCount", this.favoritesCount);
+    map.put("author", author.toProfileJSON(favoritedUser));
 
     return map;
   }
@@ -110,18 +112,7 @@ public class Article {
     return slug + "-" + postfix;
   }
 
-  // public Article(User user, String title, String description, String body, List<String> tagList) {
-  //   this.title = title;
-  //   this.description = description;
-  //   this.body = body;
-  //   this.tagList = tagList;
-  //   this.createdAt = new Date();
-  //   this.updatedAt = new Date();
-  //   this.favorited = false;
-  //   this.favoritesCount = 0;
-
-  //   this.slug = new Slugify().slugify(title);
-  //   this.author = user;
-  // }
-  
+  public void setFavoritesCount(Boolean add) {
+    this.favoritesCount += add ? +1 : -1;
+  }
 }

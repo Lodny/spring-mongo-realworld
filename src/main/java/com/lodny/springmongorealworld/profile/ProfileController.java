@@ -27,12 +27,13 @@ public class ProfileController {
 
   // profile
   @GetMapping("/{username}")
-  public ResponseEntity<?> getUserByUsername(@PathVariable String username) {
+  public ResponseEntity<?> getUserByUsername(@PathVariable String username, ServletRequest request) {
 
-    System.out.println("~~~~~~~~~~~~~~~~");
+    User user = (User)request.getAttribute("user");
+    System.out.println("~~~~~~~~~~~~~~~~" + user == null );
 
-    User user = service.findByUsername(username);
-    return new ResponseEntity<>(UTIL.jsonRoot("profile", user.toProfileJSON(null)), HttpStatus.OK);
+    User profileUser = service.findByUsername(username);
+    return new ResponseEntity<>(UTIL.jsonRoot("profile", profileUser.toProfileJSON(user)), HttpStatus.OK);
   }
 
   @PostMapping("/{username}/follow")
@@ -50,6 +51,6 @@ public class ProfileController {
 
     return new ResponseEntity<>(UTIL.jsonRoot("profile", newFollowing.toProfileJSON(user)), HttpStatus.OK);
   }
-  
+
 
 }
