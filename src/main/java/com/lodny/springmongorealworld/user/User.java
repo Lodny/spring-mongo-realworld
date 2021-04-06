@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BinaryOperator;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 import javax.validation.constraints.NotBlank;
@@ -48,6 +50,7 @@ public class User {
 
   @DBRef
   List<User> following;
+  @DBRef
   List<Article> favorites;
 
   public User(UserRegisterDto dto) {
@@ -55,6 +58,9 @@ public class User {
     this.username = dto.getUsername();
     this.email = dto.getEmail();
     this.password = (new BCryptPasswordEncoder()).encode(dto.getPassword());
+
+    this.bio = "";
+    this.image = "";
 
     this.following = new ArrayList<>();
     this.favorites = new ArrayList<>();
@@ -95,37 +101,35 @@ public class User {
 
   public void update(UserUpdateDto dto) {
 
-    String value = dto.getUsername();
-    if (null != value && !value.isBlank())
-      this.username = value;
+    // BinaryOperator<String> checkBlank = (sour, dest) -> dest.isBlank() ? sour : dest;
 
-    value = dto.getEmail();
-    if (null != value && !value.isBlank())
-      this.email = value;
+    Optional.ofNullable(dto.getUsername()).ifPresent(str -> this.username = str.isBlank() ? this.username : str);
+    Optional.ofNullable(dto.getEmail()).ifPresent(str -> this.email = str.isBlank() ? this.email : str);
+    Optional.ofNullable(dto.getBio()).ifPresent(str -> this.bio = str.isBlank() ? this.bio : str);
+    Optional.ofNullable(dto.getImage()).ifPresent(str -> this.image = str.isBlank() ? this.image : str);
+    Optional.ofNullable(dto.getPassword()).ifPresent(str -> this.password = str.isBlank() ? this.password : (new BCryptPasswordEncoder()).encode(str));
+
+    // String value = dto.getUsername();
+    // if (null != value && !value.isBlank())
+    //   this.username = value;
+
+    // value = dto.getEmail();
+    // if (null != value && !value.isBlank())
+    //   this.email = value;
 
     // value = dto.getBio();
     // if (null != value && !value.isBlank())
     //   this.bio = value;
-    Optional.ofNullable(dto.getBio()).ifPresent((@NotBlank var val) -> this.bio = val);
-    // Optional.ofNullable(dto.getBio()).ifPresent((@NotBlank var val) -> this.bio = val);
 
-    value = dto.getImage();
-    if (null != value && !value.isBlank())
-      this.image = value;
+    // value = dto.getImage();
+    // if (null != value && !value.isBlank())
+    //   this.image = value;
 
-    value = dto.getPassword();
-    if (null != value && !value.isBlank())
-      this.password = (new BCryptPasswordEncoder()).encode(value);
+    // value = dto.getPassword();
+    // if (null != value && !value.isBlank())
+    //   this.password = (new BCryptPasswordEncoder()).encode(value);
 
     this.updatedAt = new Date();
-
-    // Optional.ofNullable(dto.getUsername()).filter(o -> !o.get().isBlank()).ifPresent(op -> this.username = op.get());
-    // Optional.ofNullable(dto.getEmail()).filter(o -> !o.get().isBlank()).ifPresent(op -> this.email = op.get());
-    // Optional.ofNullable(dto.getBio()).filter(o -> !o.get().isBlank()).ifPresent(op -> this.bio = op.get());
-    // Optional.ofNullable(dto.getImage()).filter(o -> !o.get().isBlank()).ifPresent(op -> this.image = op.get());
-    // Optional.ofNullable(dto.getBio()).filter(o -> !o.get().isBlank()).ifPresent(
-    //   op -> this.password = (new BCryptPasswordEncoder()).encode(op.get())
-    // );
   }
 
   public Map<String, Object> toAuthJSON(Optional<String> token) {

@@ -21,15 +21,15 @@ public class ValidationAdvice {
 
     // System.out.println("type : " + type);
     // System.out.println("method : " + method);
-    
+
     for (Object arg : args) {
-      
+
       if (!(arg instanceof BindingResult) || !((BindingResult) arg).hasErrors()) {
-        System.out.println("> ValidationAdvice : arg : " + arg);
         continue;
       }
 
-      // HttpServletRequest request 
+      System.out.println("> ValidationAdvice : arg : " + arg);
+      // HttpServletRequest request
       //   = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
 
       // System.out.println("ValidationAdvice : arg : " + arg);

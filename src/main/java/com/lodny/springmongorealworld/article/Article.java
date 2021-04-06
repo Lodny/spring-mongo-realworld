@@ -10,6 +10,7 @@ import com.github.slugify.Slugify;
 import com.lodny.springmongorealworld.user.User;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.Getter;
@@ -36,6 +37,7 @@ public class Article {
   private String slug;
 
   // @JsonProperty("author")
+  @DBRef
   private User author;
 
   public Article(ArticleInsertDto dto, User user) {
@@ -56,31 +58,28 @@ public class Article {
 
   public void update(ArticleInsertDto dto) {
 
-    String value = dto.getTitle();
-    if (null != value && !value.isBlank())
-      this.title = value;
+    Optional.ofNullable(dto.getTitle()).ifPresent(str -> this.title = str.isBlank() ? this.title : str);
+    Optional.ofNullable(dto.getDescription()).ifPresent(str -> this.description = str.isBlank() ? this.description : str);
+    Optional.ofNullable(dto.getBody()).ifPresent(str -> this.body = str.isBlank() ? this.body : str);
+    Optional.ofNullable(dto.getTagList()).ifPresent(list -> this.tagList = list);
 
-    value = dto.getDescription();
-    if (null != value && !value.isBlank())
-      this.description = value;
+    // String value = dto.getTitle();
+    // if (null != value && !value.isBlank())
+    //   this.title = value;
 
-    value = dto.getBody();
-    if (null != value && !value.isBlank())
-      this.body = value;
+    // value = dto.getDescription();
+    // if (null != value && !value.isBlank())
+    //   this.description = value;
 
-    List<String> list = dto.getTagList();
-    if (null != list)
-      this.tagList = list;
+    // value = dto.getBody();
+    // if (null != value && !value.isBlank())
+    //   this.body = value;
+
+    // List<String> list = dto.getTagList();
+    // if (null != list)
+    //   this.tagList = list;
 
     this.updatedAt = new Date();
-
-    // Optional.ofNullable(dto.getUsername()).filter(o -> !o.get().isBlank()).ifPresent(op -> this.username = op.get());
-    // Optional.ofNullable(dto.getEmail()).filter(o -> !o.get().isBlank()).ifPresent(op -> this.email = op.get());
-    // Optional.ofNullable(dto.getBio()).filter(o -> !o.get().isBlank()).ifPresent(op -> this.bio = op.get());
-    // Optional.ofNullable(dto.getImage()).filter(o -> !o.get().isBlank()).ifPresent(op -> this.image = op.get());
-    // Optional.ofNullable(dto.getBio()).filter(o -> !o.get().isBlank()).ifPresent(
-    //   op -> this.password = (new BCryptPasswordEncoder()).encode(op.get())
-    // );
   }
 
   public Map<String, Object> toJSON(User favoritedUser) {
