@@ -52,21 +52,23 @@ public class ArticleController {
   }
 
   // get all articles
-    // My Article:  Request URL: http://localhost:8080/api/articles?author=333&limit=5&offset=0
-  // Favorited:   Request URL: http://localhost:8080/api/articles?favorited=111&limit=5&offset=0
-  // Tag ??
+    // My Article: Request URL: http://localhost:8080/api/articles?author=333&limit=5&offset=0
+  // Favorited:    Request URL: http://localhost:8080/api/articles?favorited=111&limit=5&offset=0  
+  // Tag:          Request URL: http://localhost:8080/api/articles?limit=10&offset=0&tag=222
   @GetMapping("")
   public ResponseEntity<?> findAll(
     @RequestParam(required = false) String author,
     @RequestParam(defaultValue = "10") int limit,
     @RequestParam(defaultValue = "0") int offset,
     @RequestParam(required = false) String favorited,
+    @RequestParam(required = false) String tag,
     ServletRequest request) {
 
     System.out.println("> ArticleController : findAll() : author : " + author);
     System.out.println("> ArticleController : findAll() : favorited : " + favorited);
     System.out.println("> ArticleController : findAll() : limit : " + limit);
     System.out.println("> ArticleController : findAll() : offset : " + offset);
+    System.out.println("> ArticleController : findAll() : tag : " + tag);
 
     User user = (User)request.getAttribute("user");
 
@@ -78,6 +80,9 @@ public class ArticleController {
     else if (null != favorited) {
       User favoritedAuthor = userService.findByUsername(favorited);
       list = service.findByFavorites(favoritedAuthor.getFavorites(), limit, offset);
+    }
+    else if (null != tag) {
+      list = service.findByTag(tag, limit, offset);
     }
     else {
       list = service.findAll(limit, offset);

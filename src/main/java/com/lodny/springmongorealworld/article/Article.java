@@ -13,7 +13,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 // @Getter
@@ -31,7 +30,7 @@ public class Article {
   private Date createdAt;
   private Date updatedAt;
 
-  private Boolean favorited;
+  // private Boolean favorited;
   private int favoritesCount;
 
   private String slug;
@@ -50,7 +49,7 @@ public class Article {
     this.createdAt = new Date();
     this.updatedAt = new Date();
 
-    this.favorited = false;
+    // this.favorited = false;
     this.favoritesCount = 0;
 
     this.slug = getSlugURL(this.title);

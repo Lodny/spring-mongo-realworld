@@ -1,7 +1,6 @@
 package com.lodny.springmongorealworld.article;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.lodny.springmongorealworld.exception.InvalidArticleSlugException;
@@ -85,6 +84,11 @@ public class ArticleService {
     List<String> list = following.stream().map(User::getId).collect(Collectors.toList());
 
     return repository.findByAuthorIn(list, paging);
+  }
+
+  public Page<Article> findByTag(String tag, int limit, int offset) {
+    Pageable paging = PageRequest.of(offset/10, limit, Sort.Direction.DESC, "createdAt");
+    return repository.findByTagList(tag, paging);
   }
 
   public Article findBySlug(String slug) {

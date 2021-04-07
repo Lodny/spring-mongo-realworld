@@ -1,7 +1,6 @@
 package com.lodny.springmongorealworld.article;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import com.lodny.springmongorealworld.user.User;
@@ -38,8 +37,7 @@ public interface ArticleRepository extends MongoRepository<Article, String> {
   // public List<List<String>> findTagListByTagList(String string);
   // public List<String> findTagListByTagList(String string);
 
-  // public List<String> findAllTitle();    ??
-
-// Foo findPathByPath(String path);
+  @Query(value="{ tagList : ?0 }")
+  public Page<Article> findByTagList(String tag, Pageable paging);
 
 }
