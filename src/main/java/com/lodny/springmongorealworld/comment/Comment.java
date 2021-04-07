@@ -17,12 +17,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Document("comment")
 public class Comment {
-  
+
   @Id
   private String id;
 
   private String body;
 
+  //  @DBRef(lazy = true)
+  // @DBRef
   private Article article;
   private User author;
 
@@ -43,7 +45,7 @@ public class Comment {
     map.put("body", this.body);
     map.put("createdAt", this.createdAt);
     map.put("updatedAt", this.updatedAt);
-    
+
     // map.put("article", this.article.toJSON());
     map.put("author", this.author.toProfileJSON(null));
 

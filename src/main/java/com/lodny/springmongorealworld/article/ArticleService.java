@@ -1,7 +1,7 @@
 package com.lodny.springmongorealworld.article;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.lodny.springmongorealworld.exception.InvalidArticleSlugException;
@@ -13,9 +13,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.util.Streamable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -100,6 +97,13 @@ public class ArticleService {
 
   public void remove(Article article) {
     repository.delete(article);
+  }
+
+  // public List<Map<String, String>> getAllTagList() {
+  public List<Article> getAllTagList() {
+    // return repository.findAllTitle();
+    // return repository.findTitleByTitle("");
+    return repository.findTagListByTagList("");
   }
 
 }

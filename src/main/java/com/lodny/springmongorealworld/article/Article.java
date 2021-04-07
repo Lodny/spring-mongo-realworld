@@ -16,7 +16,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
+// @Getter
 @NoArgsConstructor
 @Document("article")
 public class Article {
@@ -37,7 +37,8 @@ public class Article {
   private String slug;
 
   // @JsonProperty("author")
-  @DBRef
+  // @DBRef
+  @DBRef(lazy = true)
   private User author;
 
   public Article(ArticleInsertDto dto, User user) {
@@ -114,4 +115,13 @@ public class Article {
   public void setFavoritesCount(Boolean add) {
     this.favoritesCount += add ? +1 : -1;
   }
+
+  public String getId() {
+    return id;
+  }
+
+  public List<String> getTagList() {
+    return tagList;
+  }
+
 }

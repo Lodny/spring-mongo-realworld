@@ -6,11 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BinaryOperator;
-import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
-
-import javax.validation.constraints.NotBlank;
 
 import com.lodny.springmongorealworld.article.Article;
 
@@ -22,13 +18,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 
-@Getter
+// @Getter
 @NoArgsConstructor
 @Document("user")
-@ToString
+// @ToString
 public class User {
 
   @Id
@@ -45,12 +40,11 @@ public class User {
   private String image;
 
   private Date createdAt;
-  // @Field("updated_at")
   private Date updatedAt;
 
-  @DBRef
+  @DBRef(lazy = true)
   List<User> following;
-  @DBRef
+  @DBRef(lazy = true)
   List<Article> favorites;
 
   public User(UserRegisterDto dto) {
@@ -142,8 +136,12 @@ public class User {
     map.put("image", this.image);
     map.put("createdAt", this.createdAt);
     map.put("updatedAt", this.updatedAt);
-    map.put("following", this.following);
-    map.put("favorites", this.favorites);
+
+    // map.put("following", this.following);
+    // map.put("favorites", this.favorites);
+    //   return following.stream().map(user -> user.getId()).collect(Collectors.toList());
+    map.put("following", this.following.stream().map(user -> user.getId()).collect(Collectors.toList()));
+    map.put("favorites", this.favorites.stream().map(user -> user.getId()).collect(Collectors.toList()));
 
     return map;
   }
@@ -163,6 +161,7 @@ public class User {
     map.put("following", false);
     Optional.ofNullable(follower).ifPresent(f -> {
       Optional.ofNullable(f.getFollowing()).ifPresent(list ->
+        // map.put("following", list.stream().anyMatch(user -> user.equals(getId())))
         map.put("following", list.stream().anyMatch(user -> user.getId().equals(getId())))
       );
     });
@@ -176,6 +175,30 @@ public class User {
 
   public Boolean isFavorite(String userId) {
     return this.favorites.stream().anyMatch(article -> article.getId().equals(userId));
+  }
+
+  public List<User> getFollowing() {
+    return following;
+  }
+
+  // public List<String> getFollowing() {
+  //   return following.stream().map(user -> user.getId()).collect(Collectors.toList());
+  // }
+
+  public String getId() {
+    return id;
+  }
+
+  public String getUsername() {
+    return username;
+  }
+
+  public String getEmail() {
+    return email;
+  }
+
+  public List<Article> getFavorites() {
+    return favorites;
   }
 
 }
