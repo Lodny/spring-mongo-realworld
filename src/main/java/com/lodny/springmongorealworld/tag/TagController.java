@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Map.Entry;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.lodny.springmongorealworld.article.Article;
@@ -33,22 +34,50 @@ public class TagController {
 
     System.out.println("> TagController : getAll() : size : " + articles.size());
 
-    Map<String, Integer> mapTags = new HashMap<>();
-    articles.stream().forEach(
-      article -> article.getTagList().forEach(
-        tag -> Optional.ofNullable(mapTags.get(tag)).ifPresentOrElse(
-          value -> mapTags.put(tag, value + 1), () -> mapTags.put(tag, 1))));
-        // -> mapTags.put(tag, Optional.ofNullable(mapTags.get(tag)). .ifPresentOrElse(()->mapTags.get(tag) + 1, 1))));
+    
+    // Map<String, Integer> mapTags = new HashMap<>();
+    // articles.stream().forEach(
+    //   article -> article.getTagList().forEach(
+    //     tag -> Optional.ofNullable(mapTags.get(tag)).ifPresentOrElse(
+    //       value -> mapTags.put(tag, value + 1), () -> mapTags.put(tag, 1))));
+          // -> mapTags.put(tag, Optional.ofNullable(mapTags.get(tag)). .ifPresentOrElse(()->mapTags.get(tag) + 1, 1))))
+          
+    // articles.stream().forEach(
+    //   article -> article.getTagList().forEach(
+    //     tag -> { 
+    //       mapTags.computeIfPresent(tag, (key, val) -> val + 1);
+    //       mapTags.computeIfAbsent(tag, key -> 1);
+    //     }));
 
-    System.out.println(mapTags.toString());
+    // articles.stream().map(Article::getTagList).flatMap(List<String>::stream).forEach(
+    //     tag -> { 
+    //       mapTags.computeIfPresent(tag, (key, val) -> val + 1);
+    //       mapTags.computeIfAbsent(tag, key -> 1);
+    //     });
 
-    List<String> sortedTagList = mapTags
-          .entrySet()
-          .stream()
-          // .sorted(Comparator.comparing(Entry::getValue))
-          .sorted((p1, p2) -> p2.getValue().compareTo(p1.getValue()))
-          .limit(3)
-          .collect(Collectors.mapping(Entry::getKey, Collectors.toList()));
+      List<String> sortedTagList = articles.stream()
+        .map(Article::getTagList)
+        .flatMap(List<String>::stream)
+        .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+        .entrySet()
+        .stream()
+        .sorted((p1, p2) -> p2.getValue().compareTo(p1.getValue()))
+        .limit(3)
+        .collect(Collectors.mapping(Entry::getKey, Collectors.toList()));
+
+
+    //articles.stream().map(Article::getTagList).flatMap(List<String>::stream).collect(Collectors.toList());
+    // System.out.println(mapTags.toString());
+
+    // List<String> sortedTagList = mapTags
+    //       .entrySet()
+    //       .stream()
+    //       // .sorted(Comparator.comparing(Entry::getValue))
+    //       .sorted((p1, p2) -> p2.getValue().compareTo(p1.getValue()))
+    //       .limit(3)
+    //       // .collect(Collectors.mapping(Entry::getKey, Collectors.toList()));
+    //       .map(Entry::getKey)
+    //       .collect(Collectors.toList());          
 
     System.out.println("> sortedTagList" + sortedTagList);
 
